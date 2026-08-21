@@ -1,0 +1,92 @@
+🧠 the brain + camera
+ESP32-CAM (AI-Thinker) — core board; Wi-Fi + camera + microSD slot built in
+OV2640 NoIR camera variant — 2MP infrared-sensitive camera; works for normal video and can see near-infrared with IR illumination
+IR LEDs (850nm or 940nm) — invisible illumination for seeing in darkness
+MicroSD card, 8–32GB — local storage for photos/videos on the spider
+PCA9685 servo driver — controls all servos over I2C so the camera doesn't run out of GPIO pins
+
+
+🕷️ legs / movement — UPDATED
+12× micro servos, SG90 or MG90S — 3 per leg × 4 legs
+1× hip rotation
+1× upper-leg movement
+1× lower-leg/knee movement
+1× PCA9685 16-channel servo driver — enough channels for all 12 servos, with 4 channels left over
+3D-printed chassis — palm-sized 4-legged spider design
+Servo horns + linkages — connects the servos to the three-segment legs
+12× servo mounting hardware — brackets/screws as required by the chassis
+
+⚠️ BIG power warning: 12 servos can draw a lot of current, especially when several move simultaneously. Don't power them from the ESP32-CAM or its 5V pin.
+
+
+🔋 power
+LiPo battery — main power source
+High-current 5–6V buck converter for servos — dedicated servo power rail
+Separate 5V regulator/buck converter for ESP32-CAM + electronics
+TP4056 charging module — USB charging
+Common GND between the ESP32 and servo power system — required so the PCA9685 control signals have a shared reference
+
+So the architecture becomes:
+
+Battery → Servo buck → PCA9685 → 12 servos
+
+and separately:
+
+Battery → Electronics buck → ESP32-CAM + OV2640 NoIR + IR LEDs
+
+with GND connected between the two sides.
+
+
+🌙 infrared / night vision
+OV2640 NoIR variant — detects near-infrared because it doesn't have the normal IR-cut filter
+850nm or 940nm IR LEDs — illuminate the environment in darkness
+IR LED driver / MOSFET — lets the ESP32 turn the IR LEDs on/off
+Optional IR LED ring/board — makes mounting the illumination around the camera easier
+
+This is night vision, not thermal imaging. The camera sees reflected near-infrared light rather than detecting heat.
+
+🎮 controller
+
+Option A: Build it
+
+ESP32 board
+Small TFT screen
+Joystick
+Buttons
+
+More work, but completely custom.
+
+Option B: Phone browser first
+
+ESP32-CAM hosts its own webpage
+Live camera feed
+Movement controls
+Photo button
+Recording button
+IR/night-vision toggle
+
+Definitely B first. Get the spider working before building the fancy controller.
+
+💻 software / cloud side
+Firmware: C++ in Arduino IDE
+Spider: ESP32-CAM handles camera, Wi-Fi, servos and controls
+Backend: Node.js or Python/Flask
+Cloud storage: your own ownCloud server
+Website: HTML/CSS/JS
+Live camera feed
+Movement controls
+Take photo
+Start/stop recording
+IR LEDs ON/OFF
+SD card files
+Upload files to ownCloud
+Computer controls: keyboard keybinds for movement and toggles
+
+
+🏗️ build order — DON'T SKIP AHEAD
+Camera streaming + saving to SD
+Servos + PCA9685 → get the legs moving
+Combine everything into the 3D-printed chassis
+Add OV2640 NoIR + IR illumination
+Connect uploads to your ownCloud server
+Build the custom handheld controller LAST
